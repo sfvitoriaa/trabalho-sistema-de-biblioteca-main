@@ -103,3 +103,25 @@ tbody tr:hover td{ background:linear-gradient(90deg,#fff,#fbfbff) }
 .home-card p{ color:var(--muted-text); font-size:0.95rem }
 .home-card a{ display:inline-flex; align-items:center; gap:0.5rem; margin-top:0.8rem; color:var(--text); font-weight:700 }
 
+.check-list{
+  border:1.25px solid var(--border);
+  border-radius:10px;
+  max-height:260px;
+  overflow-y:auto;
+  background: linear-gradient(180deg, #fff, var(--muted));
+}
+.check-item{
+  display:flex;
+  align-items:center;
+  gap:0.8rem;
+  padding:0.6rem 0.9rem;
+  border-bottom:1px solid var(--border);
+  font-size:0.95rem;
+  cursor:pointer;
+}
+.check-item:last-child{ border-bottom:none }
+.check-item:hover{ background: rgba(233,213,255,0.15) }
+.check-item input[type="checkbox"]{ margin:0; width:18px; height:18px; flex:0 0 auto; accent-color:var(--lavender); cursor:pointer }
+.check-item span{ line-height:1.2 }
+.check-item .disp{ margin-left:auto; font-size:0.82rem; color:var(--muted-text) }
+
