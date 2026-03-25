@@ -91,6 +91,17 @@
       "dataEmprestimo": "2026-03-25T00:00:00.000Z",
       "status": "concluído",
       "dataDevolucao": "2026-03-25T18:34:16.435Z"
+    },
+    {
+      "id": "675d2308-a996-4848-b666-a795a9a74822",
+      "usuarioId": "a8aa8286-e719-48a5-8a35-db8687e41c50",
+      "livrosIds": [
+        "b4c1d8e2-7a6f-4b9c-8e23-2d4c6f8a0b12",
+        "c5d2e7f3-8b5a-4c0d-9f34-3e5d7a9b1c23"
+      ],
+      "dataEmprestimo": "2026-03-25T00:00:00.000Z",
+      "status": "concluído",
+      "dataDevolucao": "2026-03-25T19:41:17.933Z"
     }
   ],
   "usuarios": [
@@ -135,6 +146,12 @@
       "nome": "Bruno Alves",
       "email": "brunoatos2008@gmail.com",
       "telefone": "32999008845"
+    },
+    {
+      "id": "a8aa8286-e719-48a5-8a35-db8687e41c50",
+      "nome": "Rita De Cássia",
+      "email": "ritamelo0311@gmail.com",
+      "telefone": "32998260530"
     }
   ]
 }
