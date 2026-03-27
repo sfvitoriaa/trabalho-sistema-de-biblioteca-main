@@ -2,40 +2,31 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="container">
-      <div className="home-hero card">
-        <div className="hero-text">
-          <h1>Bem-vindo à Biblioteca</h1>
-          <p>Explore os recursos: gerencie usuários, acervo e empréstimos com facilidade.</p>
-        </div>
-        <div>
-          <Link href="/" className="btn btn-secondary">Painel</Link>
-        </div>
+    <div style={{maxWidth:800, margin:"20px auto", padding:"10px"}}>
+      <div style={{border:"1px solid #ccc", padding:"10px", marginBottom:"15px"}}>
+        <h1>Bem-vindo à Biblioteca</h1>
+        <p>Explore os recursos: gerencie usuários, acervo e empréstimos.</p>
+        <Link href="/" style={{display:"inline-block", marginTop:"10px", padding:"6px 12px", background:"#eee", textDecoration:"none"}}>
+          Painel
+        </Link>
       </div>
 
-      <div className="cards-grid">
-        <Link href="/usuarios" className="home-card">
-          <div className="icon" aria-hidden="true" />
+      <div>
+        <Link href="/usuarios" style={{display:"block", border:"1px solid #ccc", padding:"10px", marginBottom:"10px", textDecoration:"none", color:"#333"}}>
           <h3>Usuários</h3>
-          <p>Adicionar, editar e gerenciar os usuários da biblioteca.</p>
-          <div style={{marginTop:12, fontWeight:700}}>Ir para Usuários →</div>
+          <p>Gerenciar os usuários da biblioteca.</p>
         </Link>
 
-        <Link href="/livros" className="home-card">
-          <div className="icon" aria-hidden="true" />
+        <Link href="/livros" style={{display:"block", border:"1px solid #ccc", padding:"10px", marginBottom:"10px", textDecoration:"none", color:"#333"}}>
           <h3>Acervo</h3>
-          <p>Visualize, cadastre e atualize informações dos títulos.</p>
-          <div style={{marginTop:12, fontWeight:700}}>Ir para Livros →</div>
+          <p>Visualizar e atualizar informações dos títulos.</p>
         </Link>
 
-        <Link href="/emprestimos" className="home-card">
-          <div className="icon" aria-hidden="true" />
+        <Link href="/emprestimos" style={{display:"block", border:"1px solid #ccc", padding:"10px", marginBottom:"10px", textDecoration:"none", color:"#333"}}>
           <h3>Empréstimos</h3>
-          <p>Gerencie empréstimos, devoluções e o histórico.</p>
-          <div style={{marginTop:12, fontWeight:700}}>Ir para Empréstimos →</div>
+          <p>Gerenciar empréstimos e devoluções.</p>
         </Link>
       </div>
-
     </div>
   );
 }
