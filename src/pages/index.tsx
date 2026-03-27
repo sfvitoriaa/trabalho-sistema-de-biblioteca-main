@@ -3,13 +3,8 @@ import Link from "next/link";
 export default function Home() {
   return (
     <div style={{maxWidth:800, margin:"20px auto", padding:"10px"}}>
-      <div style={{border:"1px solid #ccc", padding:"10px", marginBottom:"15px"}}>
         <h1>Bem-vindo à Biblioteca</h1>
         <p>Explore os recursos: gerencie usuários, acervo e empréstimos.</p>
-        <Link href="/" style={{display:"inline-block", marginTop:"10px", padding:"6px 12px", background:"#eee", textDecoration:"none"}}>
-          Painel
-        </Link>
-      </div>
 
       <div>
         <Link href="/usuarios" style={{display:"block", border:"1px solid #ccc", padding:"10px", marginBottom:"10px", textDecoration:"none", color:"#333"}}>
