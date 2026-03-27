@@ -1,16 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #ffffff;
-  --card: #ffffff;
-  --muted: #f7f7f7;
-  --lavender: #e9d5ff;
-  --peach: #ffe6e6;
-  --mint: #e6fff0;
-  --text: #333333;
-  --muted-text: #666666;
+  --bg: #fff;
+  --text: #333;
+  --border: #ddd;
   --accent: #ffd6e0;
-  --border: #dddddd;
+  --muted: #f9f9f9;
 }
 
 body {
@@ -21,158 +16,125 @@ body {
   padding: 0;
 }
 
+/* Navbar */
 .navbar {
-  background: var(--lavender);
-  padding: 10px;
+  background: var(--accent);
+  padding: 12px;
 }
 .navbar a {
   color: var(--text);
-  margin-right: 10px;
+  margin-right: 15px;
   text-decoration: none;
+  font-weight: bold;
 }
 
+/* Container */
 .container {
   max-width: 900px;
   margin: 20px auto;
   padding: 10px;
 }
 
-.page-header h1 {
-  font-size: 20px;
-  font-weight: bold;
-}
-.page-header p {
-  color: var(--muted-text);
-  font-size: 14px;
-}
-
-.card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  padding: 10px;
+/* Títulos */
+h1 {
+  font-size: 24px;
   margin-bottom: 15px;
 }
-.card-title {
-  font-size: 16px;
-  font-weight: bold;
-  margin-bottom: 8px;
+h2 {
+  font-size: 18px;
+  margin-bottom: 10px;
 }
 
+/* Cards */
+.card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.card h2 {
+  margin-bottom: 12px;
+}
+
+/* Grid */
 .grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 20px;
 }
-@media (max-width: 780px) {
-  .grid-2 {
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-top: 20px;
+}
+@media (max-width: 768px) {
+  .grid-2, .grid-3 {
     grid-template-columns: 1fr;
   }
 }
 
-.stat-card {
-  background: var(--muted);
-  border: 1px solid var(--border);
-  padding: 10px;
-}
-.stat-card .number {
-  font-size: 18px;
-  font-weight: bold;
-}
-.stat-card .label {
-  font-size: 12px;
-  color: var(--muted-text);
-}
-
-.form-group {
-  margin-bottom: 10px;
-}
-.form-group label {
-  font-size: 13px;
-  color: var(--muted-text);
-}
-.form-group input,
-.form-group select {
+/* Formulários */
+input, select {
   width: 100%;
-  padding: 6px;
+  padding: 8px;
   border: 1px solid var(--border);
+  border-radius: 4px;
+  margin-bottom: 12px;
+  font-size: 14px;
 }
 
+/* Botões */
 .btn {
-  padding: 6px 12px;
+  padding: 8px 14px;
   border: none;
+  border-radius: 4px;
   cursor: pointer;
+  font-weight: bold;
 }
 .btn-primary {
   background: var(--accent);
   color: var(--text);
+  transition: background 0.2s;
 }
-.btn-secondary {
-  background: var(--muted);
-  color: var(--text);
-}
-
-.alert {
-  padding: 8px;
-  margin-bottom: 10px;
-  font-size: 13px;
-}
-.alert-success {
-  background: var(--mint);
-  color: #0f7a4f;
-}
-.alert-error {
-  background: var(--peach);
-  color: #a12b2b;
+.btn-primary:hover {
+  background: #ffc0cb;
 }
 
+/* Tabelas */
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 14px;
 }
-thead th {
-  text-align: left;
+th, td {
   border-bottom: 1px solid var(--border);
-  padding: 6px;
-}
-tbody td {
-  border-bottom: 1px solid var(--border);
-  padding: 6px;
-}
-
-.badge {
-  padding: 3px 6px;
-  font-size: 12px;
-  border-radius: 4px;
-}
-.badge-ativo {
-  background: var(--mint);
-}
-.badge-esgotado {
-  background: var(--peach);
-}
-
-.home-card {
-  border: 1px solid var(--border);
   padding: 10px;
-  margin-bottom: 10px;
+  text-align: left;
 }
-.home-card h3 {
-  font-size: 15px;
-  margin-bottom: 5px;
+thead {
+  background: var(--muted);
+}
+tbody tr:nth-child(even) {
+  background: #fdfdfd;
+}
+
+/* Home cards */
+.home-card {
+  text-decoration: none;
+  color: var(--text);
+  transition: background 0.2s;
+}
+.home-card:hover {
+  background: var(--accent);
+}
+.home-card h2 {
+  font-size: 16px;
+  margin-bottom: 6px;
 }
 .home-card p {
-  font-size: 13px;
-  color: var(--muted-text);
-}
-
-.check-list {
-  border: 1px solid var(--border);
-  max-height: 200px;
-  overflow-y: auto;
-}
-.check-item {
-  padding: 8px;
-  border-bottom: 1px solid var(--border);
-  font-size: 13px;
+  font-size: 14px;
+  color: #666;
 }

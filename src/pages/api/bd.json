@@ -6,7 +6,7 @@
       "autor": "Machado de Assis",
       "genero": "Romance",
       "quantidade": 5,
-      "qtdEmprestados": 0
+      "qtdEmprestados": 1
     },
     {
       "id": "b4c1d8e2-7a6f-4b9c-8e23-2d4c6f8a0b12",
@@ -102,6 +102,25 @@
       "dataEmprestimo": "2026-03-25T00:00:00.000Z",
       "status": "concluído",
       "dataDevolucao": "2026-03-25T19:41:17.933Z"
+    },
+    {
+      "id": "97501624-d3da-45a6-954d-033a3962d369",
+      "usuarioId": "b4c1d8e2-7a6f-4b9c-8e23-2ddd6f8a0b12",
+      "livrosIds": [
+        "b4c1d8e2-7a6f-4b9c-8e23-2d4c6f8a0b12"
+      ],
+      "dataEmprestimo": "2026-03-27T03:33:57.989Z",
+      "status": "concluído",
+      "dataDevolucao": "2026-03-27T03:38:56.335Z"
+    },
+    {
+      "id": "2fef0cb5-67c9-4f19-9730-fc24955e2a42",
+      "usuarioId": "b4c1d8e2-7a6f-4b9c-8e23-2ddd6f8a0b12",
+      "livrosIds": [
+        "a3f2e9d1-6b7c-4f8a-9d12-1c3b5e7f9a01"
+      ],
+      "dataEmprestimo": "2026-03-27T03:38:55.026Z",
+      "status": "ativo"
     }
   ],
   "usuarios": [

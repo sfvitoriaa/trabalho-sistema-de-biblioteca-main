@@ -1,212 +1,121 @@
 import { useState, useEffect } from "react";
 
-interface Usuario   { id: string; nome: string; email: string; }
-interface Livro     { id: string; titulo: string; autor: string; quantidade: number; qtdEmprestados: number; }
-interface Emprestimo{ id: string; usuarioId: string; livrosIds: string[]; dataEmprestimo: string; status: string; }
+interface Usuario { id: string; nome: string; }
+interface Livro { id: string; titulo: string; quantidade: number; qtdEmprestados: number; }
+interface Emprestimo { id: string; usuarioId: string; livrosIds: string[]; dataEmprestimo: string; status: string; }
 
 export default function Emprestimos() {
-  const [usuarios,    setUsuarios]    = useState<Usuario[]>([]);
-  const [livros,      setLivros]      = useState<Livro[]>([]);
+  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+  const [livros, setLivros] = useState<Livro[]>([]);
   const [emprestimos, setEmprestimos] = useState<Emprestimo[]>([]);
 
-  const [usuarioId,   setUsuarioId]   = useState("");
-  const [livrosSel,   setLivrosSel]   = useState<string[]>([]);
-  const [dataEmp,     setDataEmp]     = useState(() => new Date().toISOString().split("T")[0]);
-  const [emprestimoId,setEmprestimoId]= useState("");
+  const [usuarioId, setUsuarioId] = useState("");
+  const [livroSel, setLivroSel] = useState(""); // agora só um livro
+  const [emprestimoId, setEmprestimoId] = useState("");
 
-  const [msgEmp, setMsgEmp] = useState<{ ok: boolean; text: string } | null>(null);
-  const [msgDev, setMsgDev] = useState<{ ok: boolean; text: string } | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  async function load() {
-    const [u, l, e] = await Promise.all([
+  useEffect(() => {
+    Promise.all([
       fetch("/api/list/usuarios").then(r => r.json()),
       fetch("/api/list/livros").then(r => r.json()),
       fetch("/api/list/emprestimos").then(r => r.json()),
-    ]);
-    setUsuarios(u.usuarios || []);
-    setLivros(l.livros || []);
-    setEmprestimos(e.emprestimos || []);
-  }
+    ]).then(([u, l, e]) => {
+      setUsuarios(u.usuarios || []);
+      setLivros(l.livros || []);
+      setEmprestimos(e.emprestimos || []);
+    });
+  }, []);
 
-  useEffect(() => { load(); }, []);
+  const disponiveis = livros.filter(l => l.quantidade > l.qtdEmprestados);
+  const ativos = emprestimos.filter(e => e.status === "ativo");
 
-  function toggle(id: string) {
-    setLivrosSel(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
-  }
-
-  async function submitEmp(e: React.FormEvent) {
+  async function registrarEmprestimo(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true); setMsgEmp(null);
-    const r = await fetch("/api/emprestar", {
+    await fetch("/api/emprestar", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ usuarioId, livrosIds: livrosSel, dataEmprestimo: new Date(dataEmp).toISOString() }),
+      body: JSON.stringify({ usuarioId, livrosIds: [livroSel] }), // envia só um livro
     });
-    const d = await r.json();
-    setMsgEmp({ ok: r.ok, text: d.mensagem });
-    if (r.ok) { setUsuarioId(""); setLivrosSel([]); setDataEmp(new Date().toISOString().split("T")[0]); load(); }
-    setLoading(false);
+    setUsuarioId(""); setLivroSel("");
   }
 
-  async function submitDev(e: React.FormEvent) {
+  async function confirmarDevolucao(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true); setMsgDev(null);
-    const r = await fetch("/api/devolver", {
+    await fetch("/api/devolver", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ emprestimoId }),
     });
-    const d = await r.json();
-    setMsgDev({ ok: r.ok, text: d.mensagem });
-    if (r.ok) { setEmprestimoId(""); load(); }
-    setLoading(false);
+    setEmprestimoId("");
   }
-
-  const disponiveis   = livros.filter(l => l.quantidade > l.qtdEmprestados);
-  const ativos        = emprestimos.filter(e => e.status === "ativo");
-  const empSelecionado= emprestimos.find(e => e.id === emprestimoId);
 
   return (
     <div className="container">
-      <div className="page-header">
-        <h1>Empréstimos</h1>
-        <p>{ativos.length} ativo{ativos.length !== 1 ? "s" : ""} · {emprestimos.length} no total</p>
-      </div>
+      <h1>Empréstimos</h1>
 
-      <div className="grid-2" style={{ marginBottom: "1.5rem" }}>
+      {/* Novo empréstimo */}
+      <form className="card" onSubmit={registrarEmprestimo}>
+        <h2>Novo empréstimo</h2>
+        <select value={usuarioId} onChange={e => setUsuarioId(e.target.value)} required>
+          <option value="">Selecione um usuário...</option>
+          {usuarios.map(u => <option key={u.id} value={u.id}>{u.nome}</option>)}
+        </select>
 
-       
-        <div className="card">
-          <p className="card-title">Novo empréstimo</p>
+        <select value={livroSel} onChange={e => setLivroSel(e.target.value)} required>
+          <option value="">Selecione um livro...</option>
+          {disponiveis.map(l => (
+            <option key={l.id} value={l.id}>
+              {l.titulo} ({l.quantidade - l.qtdEmprestados} disponíveis)
+            </option>
+          ))}
+        </select>
 
-          {msgEmp && <div className={`alert ${msgEmp.ok ? "alert-success" : "alert-error"}`}>{msgEmp.text}</div>}
+        <button className="btn btn-primary" disabled={!usuarioId || !livroSel}>
+          Registrar
+        </button>
+      </form>
 
-          <form onSubmit={submitEmp}>
-            <div className="form-group">
-              <label>Usuário</label>
-              <select value={usuarioId} onChange={e => setUsuarioId(e.target.value)} required>
-                <option value="">Selecione um usuário...</option>
-                {usuarios.map(u => (
-                  <option key={u.id} value={u.id}>{u.nome}</option>
-                ))}
-              </select>
-            </div>
+      {/* Devolução */}
+      <form className="card" onSubmit={confirmarDevolucao}>
+        <h2>Devolução</h2>
+        <select value={emprestimoId} onChange={e => setEmprestimoId(e.target.value)} required>
+          <option value="">Selecione um empréstimo...</option>
+          {ativos.map(emp => (
+            <option key={emp.id} value={emp.id}>
+              {usuarios.find(u => u.id === emp.usuarioId)?.nome} — {emp.livrosIds.length} livro(s)
+            </option>
+          ))}
+        </select>
+        <button className="btn btn-primary" disabled={!emprestimoId}>
+          Confirmar
+        </button>
+      </form>
 
-            <div className="form-group">
-              <label>Data do empréstimo</label>
-              <input type="date" value={dataEmp} onChange={e => setDataEmp(e.target.value)} required />
-            </div>
-
-            <div className="form-group">
-              <label>Livros disponíveis</label>
-              {disponiveis.length === 0 ? (
-                <p style={{ fontSize: "0.82rem", color: "#aaa", fontStyle: "italic" }}>Nenhum livro disponível.</p>
-              ) : (
-                <div className="check-list">
-                  {disponiveis.map(l => (
-                    <label className="check-item" key={l.id}>
-                      <input
-                        type="checkbox"
-                        checked={livrosSel.includes(l.id)}
-                        onChange={() => toggle(l.id)}
-                      />
-                      <span>{l.titulo}</span>
-                      <span className="disp">{l.quantidade - l.qtdEmprestados} disp.</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <button className="btn btn-primary"  type="submit" disabled={loading || livrosSel.length === 0}>
-              {loading ? "Salvando..." : "Registrar empréstimo"}
-            </button>
-          </form>
-        </div>
-
-        <div className="card">
-          <p className="card-title">Devolução</p>
-
-          {msgDev && <div className={`alert ${msgDev.ok ? "alert-success" : "alert-error"}`}>{msgDev.text}</div>}
-
-          <form onSubmit={submitDev}>
-            <div className="form-group">
-              <label>Empréstimo ativo</label>
-              {ativos.length === 0 ? (
-                <p style={{ fontSize: "0.82rem", color: "#aaa", fontStyle: "italic", marginTop: "0.4rem" }}>
-                  Nenhum empréstimo ativo no momento.
-                </p>
-              ) : (
-                <select value={emprestimoId} onChange={e => setEmprestimoId(e.target.value)} required>
-                  <option value="">Selecione...</option>
-                  {ativos.map(emp => {
-                    const u  = usuarios.find(u => u.id === emp.usuarioId);
-                    const dt = new Date(emp.dataEmprestimo).toLocaleDateString("pt-BR");
-                    return (
-                      <option key={emp.id} value={emp.id}>
-                        {u?.nome ?? "?"} — {emp.livrosIds.length} livro(s) — {dt}
-                      </option>
-                    );
-                  })}
-                </select>
-              )}
-            </div>
-
-            {empSelecionado && (
-              <div className="dev-preview">
-                <div className="dev-preview-label">Livros a devolver</div>
-                {empSelecionado.livrosIds.map(id => {
-                  const l = livros.find(l => l.id === id);
-                  return <div key={id}>• {l?.titulo ?? id}</div>;
-                })}
-              </div>
-            )}
-
-            <button className="btn btn-primary" type="submit" disabled={loading || !emprestimoId}>
-              {loading ? "Salvando..." : "Confirmar devolução"}
-            </button>
-          </form>
-        </div>
-      </div>
-
+      {/* Histórico */}
       <div className="card">
-        <p className="card-title">Histórico de empréstimos</p>
+        <h2>Histórico de empréstimos</h2>
         {emprestimos.length === 0 ? (
-          <p className="empty">Nenhum empréstimo registrado ainda.</p>
+          <p>Nenhum empréstimo registrado.</p>
         ) : (
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Usuário</th>
-                  <th>Livros</th>
-                  <th>Data</th>
-                  <th>Status</th>
+          <table>
+            <thead>
+              <tr>
+                <th>Usuário</th>
+                <th>Livro</th>
+                <th>Data</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {emprestimos.map(emp => (
+                <tr key={emp.id}>
+                  <td>{usuarios.find(u => u.id === emp.usuarioId)?.nome}</td>
+                  <td>{emp.livrosIds.map(id => livros.find(l => l.id === id)?.titulo).join(", ")}</td>
+                  <td>{new Date(emp.dataEmprestimo).toLocaleDateString("pt-BR")}</td>
+                  <td>{emp.status === "ativo" ? "Em andamento" : "Concluído"}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {[...emprestimos].reverse().map(emp => {
-                  const u      = usuarios.find(u => u.id === emp.usuarioId);
-                  const titulos= emp.livrosIds.map(id => livros.find(l => l.id === id)?.titulo ?? id).join(", ");
-                  return (
-                    <tr key={emp.id}>
-                      <td>{u?.nome ?? "—"}</td>
-                      <td style={{ maxWidth: 240, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        {titulos}
-                      </td>
-                      <td>{new Date(emp.dataEmprestimo).toLocaleDateString("pt-BR")}</td>
-                      <td>
-                        <span className={`badge ${emp.status === "ativo" ? "badge-ativo" : "badge-concluido"}`}>
-                          {emp.status}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
     </div>
