@@ -10,6 +10,7 @@ interface Usuario {
 export default function Usuarios() {
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [form, setForm] = useState({ nome: "", email: "", telefone: "" });
+  const [mostrarLista, setMostrarLista] = useState(false);
 
   useEffect(() => {
     fetch("/api/list/usuarios")
@@ -31,57 +32,56 @@ export default function Usuarios() {
 
   return (
     <div className="container">
-      <h1>Usuários</h1>
+      <h1>👥 Gestão de Usuários</h1>
 
       {/* Formulário */}
       <form className="card" onSubmit={handleSubmit}>
-        <h2>Novo usuário</h2>
+        <h2>➕ Novo usuário</h2>
+        <label>👤 Nome completo</label>
         <input
           value={form.nome}
           onChange={e => setForm({ ...form, nome: e.target.value })}
-          placeholder="Nome completo"
           required
         />
+        <label>📧 E-mail</label>
         <input
           type="email"
           value={form.email}
           onChange={e => setForm({ ...form, email: e.target.value })}
-          placeholder="email@exemplo.com"
           required
         />
+        <label>📱 Telefone</label>
         <input
           value={form.telefone}
           onChange={e => setForm({ ...form, telefone: e.target.value })}
-          placeholder="(11) 99999-9999"
           required
         />
-        <button className="btn btn-primary">Cadastrar</button>
+        <button className="btn btn-primary">Cadastrar usuário</button>
       </form>
 
-      {/* Lista */}
+      {/* Botão para mostrar/ocultar lista */}
       <div className="card">
-        <h2>Lista de usuários</h2>
-        {usuarios.length === 0 ? (
-          <p>Nenhum usuário cadastrado.</p>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>Nome</th>
-                <th>E-mail</th>
-                <th>Telefone</th>
-              </tr>
-            </thead>
-            <tbody>
-              {usuarios.map(u => (
-                <tr key={u.id}>
-                  <td>{u.nome}</td>
-                  <td>{u.email}</td>
-                  <td>{u.telefone}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <button 
+          className="btn btn-primary" 
+          onClick={() => setMostrarLista(!mostrarLista)}
+        >
+          {mostrarLista ? "Ocultar lista de usuários" : "Mostrar lista de usuários"}
+        </button>
+
+        {mostrarLista && (
+          <div className="grid-2" style={{marginTop:"20px"}}>
+            {usuarios.length === 0 ? (
+              <p>Nenhum usuário cadastrado.</p>
+            ) : (
+              usuarios.map(u => (
+                <div key={u.id} className="usuario-card">
+                  <h3>{u.nome}</h3>
+                  <p><span className="badge badge-email">📧 {u.email}</span></p>
+                  <p><span className="badge badge-telefone">📱 {u.telefone}</span></p>
+                </div>
+              ))
+            )}
+          </div>
         )}
       </div>
     </div>

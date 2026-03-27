@@ -2,6 +2,7 @@ import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useState } from "react";
 
 const links = [
   { href: "/",            label: "Início"      },
@@ -12,19 +13,32 @@ const links = [
 
 function Navbar() {
   const { pathname } = useRouter();
+  const [open, setOpen] = useState(false);
+
   return (
-    <nav className="navbar">
-      <Link href="/" className="navbar-brand">Biblioteca Virtual</Link >
-      {links.map((l) => (
-        <Link
-          key={l.href}
-          href={l.href}
-          className={pathname === l.href ? "active" : ""}
+    <header className="navbar">
+      <div className="navbar-container">
+        <Link href="/" className="navbar-brand">📚 Biblioteca Virtual</Link>
+        <button 
+          className="navbar-toggle" 
+          onClick={() => setOpen(!open)}
         >
-          {l.label}
-        </Link>
-      ))}
-    </nav>
+          ☰
+        </button>
+        <nav className={`navbar-links ${open ? "show" : ""}`}>
+          {links.map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              className={pathname === l.href ? "active" : ""}
+              onClick={() => setOpen(false)}
+            >
+              {l.label}
+            </Link>
+          ))}
+        </nav>
+      </div>
+    </header>
   );
 }
 
@@ -32,7 +46,9 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <Navbar />
-      <Component {...pageProps} />
+      <main className="page-content">
+        <Component {...pageProps} />
+      </main>
     </>
   );
 }

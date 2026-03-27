@@ -1,52 +1,79 @@
-import fs from 'fs'
-import path from 'path'
-import { v4 as uuidv4 } from 'uuid'
-import type { NextApiRequest, NextApiResponse } from 'next'
+import fs from "fs";
+import path from "path";
+import { v4 as uuidv4 } from "uuid";
+import type { NextApiRequest, NextApiResponse } from "next";
 
-const filePath = path.join(process.cwd(), 'src', 'pages', 'api', 'bd.json')
+const filePath = path.join(process.cwd(), "src", "pages", "api", "bd.json");
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
-    const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'))
-    const { usuarios, livros, emprestimos } = data
+  if (req.method !== "POST") {
+    return res.status(405).json({ mensagem: "Método não permitido." });
+  }
 
-    const { usuarioId, livrosIds, dataEmprestimo } = req.body
+  const data = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+  const { usuarios, livros, emprestimos } = data;
 
-    if (!usuarioId || !livrosIds || !Array.isArray(livrosIds) || livrosIds.length === 0) {
-        return res.status(400).json({ mensagem: 'usuarioId e livrosIds são obrigatórios.' })
+  const { usuarioId, livrosIds, dataEmprestimo } = req.body;
+
+  // validações iniciais
+  if (!usuarioId || !Array.isArray(livrosIds) || livrosIds.length === 0) {
+    return res
+      .status(400)
+      .json({ mensagem: "usuarioId e livrosIds são obrigatórios." });
+  }
+
+  const usuario = usuarios.find((u: Usuario) => u.id === usuarioId);
+  if (!usuario) {
+    return res.status(404).json({ mensagem: "Usuário não encontrado." });
+  }
+
+  // valida cada livro
+  for (const livroId of livrosIds) {
+    const livro = livros.find((l: Livro) => l.id === livroId);
+    if (!livro) {
+      return res
+        .status(404)
+        .json({ mensagem: `Livro com id "${livroId}" não encontrado.` });
     }
-
-    const usuario = usuarios.find((u: any) => u.id === usuarioId)
-    if (!usuario) {
-        return res.status(404).json({ mensagem: 'Usuário não encontrado.' })
+    if (livro.quantidade <= livro.qtdEmprestados) {
+      return res
+        .status(400)
+        .json({ mensagem: `Livro "${livro.titulo}" sem unidades disponíveis.` });
     }
+  }
 
-    for (const livroId of livrosIds) {
-        const livro = livros.find((l: any) => l.id === livroId)
+  // atualiza quantidade emprestada
+  livrosIds.forEach((livroId) => {
+    const livro = livros.find((l: Livro) => l.id === livroId);
+    if (livro) livro.qtdEmprestados += 1;
+  });
 
-        if (!livro) {
-            return res.status(404).json({ mensagem: `Livro "${livroId}" não encontrado.` })
-        }
+  const novoEmprestimo = {
+    id: uuidv4(),
+    usuarioId,
+    livrosIds,
+    dataEmprestimo: dataEmprestimo || new Date().toISOString(),
+    status: "ativo",
+  };
 
-        if (livro.quantidade <= livro.qtdEmprestados) {
-            return res.status(400).json({ mensagem: `Livro "${livro.titulo}" sem unidades disponíveis.` })
-        }
-    }
+  emprestimos.push(novoEmprestimo);
 
-    for (const livroId of livrosIds) {
-        const livro = livros.find((l: any) => l.id === livroId)
-        livro.qtdEmprestados += 1
-    }
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
 
-    const novoEmprestimo = {
-        id: uuidv4(),
-        usuarioId,
-        livrosIds,
-        dataEmprestimo: dataEmprestimo || new Date().toISOString(),
-        status: 'ativo'
-    }
+  return res.status(200).json({
+    mensagem: "Empréstimo realizado com sucesso!",
+    emprestimo: novoEmprestimo,
+  });
+}
 
-    emprestimos.push(novoEmprestimo)
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2))
-
-    return res.status(200).json({ mensagem: 'Empréstimo realizado com sucesso!', emprestimo: novoEmprestimo })
+// Tipos auxiliares
+interface Usuario {
+  id: string;
+  nome: string;
+}
+interface Livro {
+  id: string;
+  titulo: string;
+  quantidade: number;
+  qtdEmprestados: number;
 }
